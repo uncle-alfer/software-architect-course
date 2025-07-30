@@ -1,0 +1,13 @@
+@startuml DeviceComponents
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(deviceSvc, "Device Service")
+
+Component(Api,           "REST API",         "Fiber Router")
+Component(CommandHandler, "Command Handler",  "business logic")
+Component(DeviceRepo,     "Device Repository","Postgres DAO")
+
+Rel(Api,           CommandHandler, "JSON → Cmd")
+Rel(CommandHandler, DeviceRepo,     "CRUD")
+
+@enduml

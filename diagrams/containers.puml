@@ -1,0 +1,25 @@
+@startuml Containers
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Пользователь")
+
+System_Boundary(boundary, "WarmHouse SaaS") {
+  Container(web,          "API Gateway",      "Go/Fiber",       "REST, auth, rate‑limit")
+  Container(deviceSvc,    "Device Service",   "Go",             "CRUD устройств")
+  Container(telemetrySvc, "Telemetry Service","Python/FastAPI", "gRPC ingest, Kafka producer")
+  Container(heatingSvc,   "Heating Control",  "Go",             "команды отоплению")
+  Container(ruleSvc,      "Rule Engine",      "NodeJS",         "if‑this‑then‑that")
+  ContainerDb(pg,         "PostgreSQL",       "SQL",            "User & device data")
+  ContainerDb(tsdb,       "TimescaleDB",      "TimeSeries DB",  "Telemetry")
+  Container(kafka,        "Kafka",            "Event Bus",      "async events")
+}
+
+Rel(user,       web,          "HTTPS / JWT")
+Rel(web,        deviceSvc,    "REST")
+Rel(web,        heatingSvc,   "REST")
+Rel(telemetrySvc, kafka,      "produce telemetry")
+Rel(kafka,      ruleSvc,      "consume events")
+Rel(deviceSvc,  pg,           "SQL")
+Rel(telemetrySvc, tsdb,       "insert")
+
+@enduml

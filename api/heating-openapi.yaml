@@ -1,0 +1,72 @@
+﻿openapi: 3.0.0
+info:
+  title: Heating Service API
+  version: 1.0.0
+  description: Управление отоплением и расписаниями температуры.
+servers:
+  - url: https://api.warmhouse.io/heating
+paths:
+  /heating/{roomId}/on:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      summary: Turn heating ON in room
+      responses:
+        '202': { description: Accepted }
+
+  /heating/{roomId}/off:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      summary: Turn heating OFF in room
+      responses:
+        '202': { description: Accepted }
+
+  /schedules:
+    get:
+      summary: List schedules
+      responses:
+        '200':
+          description: Heating schedules
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Schedule' }
+    post:
+      summary: Create schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NewSchedule' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Schedule' }
+
+components:
+  parameters:
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      schema: { type: string }
+  schemas:
+    NewSchedule:
+      type: object
+      required: [roomId, startTime, endTime, targetTemp]
+      properties:
+        roomId: { type: string }
+        startTime: { type: string, format: time }
+        endTime: { type: string, format: time }
+        targetTemp: { type: number, format: float }
+    Schedule:
+      allOf:
+        - $ref: '#/components/schemas/NewSchedule'
+        - type: object
+          properties:
+            id: { type: string }
+            enabled: { type: boolean }

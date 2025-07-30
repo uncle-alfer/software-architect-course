@@ -1,0 +1,74 @@
+﻿openapi: 3.0.0
+info:
+  title: Auth Service API
+  version: 1.0.0
+servers:
+  - url: https://api.warmhouse.io/auth
+paths:
+  /register:
+    post:
+      summary: Create user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Register' }
+      responses:
+        '201': { description: Created }
+  /login:
+    post:
+      summary: Obtain JWT token pair
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Login' }
+      responses:
+        '200':
+          description: Tokens
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+  /refresh:
+    post:
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200':
+          description: New tokens
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Register:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+    Login:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+    LoginResponse:
+      type: object
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }

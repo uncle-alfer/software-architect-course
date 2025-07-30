@@ -1,0 +1,13 @@
+@startuml HeatingSequence
+actor User
+participant "API Gateway"   as api
+participant "Heating Service" as heat
+participant "Device Controller" as ctrl
+
+User -> api  : POST /heating/{id}/on
+api  -> heat : commandOn(id)
+heat -> ctrl : HTTP/Modbus ON
+ctrl --> heat : 200 OK
+heat --> api  : 202 Accepted
+api  --> User : 202 Accepted
+@enduml
