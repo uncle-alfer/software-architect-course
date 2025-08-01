@@ -1,0 +1,86 @@
+@startuml
+' ---------- стили ----------
+!define table(x) class "x" as x << (T,#FEFEFF) >>
+hide methods
+hide stereotypes
+
+' ---------- сущности ----------
+table(User) {
+  id PK
+  email
+  password_hash
+  role
+}
+
+table(House) {
+  id PK
+  user_id FK
+  address
+  name
+}
+
+table(Room) {
+  id PK
+  house_id FK
+  name
+}
+
+table(DeviceType) {
+  id PK
+  name
+  vendor
+  category
+}
+
+table(Device) {
+  id PK
+  room_id FK
+  type_id FK
+  serial_number
+  status
+  last_seen
+}
+
+table(Telemetry) {
+  id PK
+  device_id FK
+  ts
+  key
+  value
+}
+
+table(HeatingSchedule) {
+  id PK
+  room_id FK
+  start_time
+  end_time
+  target_temp
+  enabled
+}
+
+table(Rule) {
+  id PK
+  user_id FK
+  name
+  expression
+  enabled
+}
+
+table(RuleAction) {
+  id PK
+  rule_id FK
+  action_type
+  params
+}
+
+' ---------- связи ----------
+User  ||--o{ House
+House ||--o{ Room
+Room  ||--o{ Device
+DeviceType ||--o{ Device
+Device ||--o{ Telemetry
+Room ||--o{ HeatingSchedule
+User ||--o{ Rule
+Rule ||--o{ RuleAction
+
+@enduml

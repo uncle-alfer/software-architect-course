@@ -1,0 +1,91 @@
+﻿openapi: 3.0.0
+info:
+  title: Device Service API
+  version: 1.0.0
+  description: |
+    CRUD устройств умного дома и отправка команд на конкретное устройство.
+servers:
+  - url: https://api.warmhouse.io/device
+paths:
+  /devices:
+    get:
+      summary: List devices
+      responses:
+        '200':
+          description: Array of devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Device' }
+    post:
+      summary: Register new device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NewDevice' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Device' }
+
+  /devices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    get:
+      summary: Get one device
+      responses:
+        '200':
+          description: Device
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Device' }
+    delete:
+      summary: Delete device
+      responses:
+        '204': { description: Deleted }
+
+  /devices/{id}/commands:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    post:
+      summary: Send command to device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Command' }
+      responses:
+        '202': { description: Accepted }
+
+components:
+  parameters:
+    DeviceId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+  schemas:
+    NewDevice:
+      type: object
+      required: [serialNumber, typeId]
+      properties:
+        serialNumber: { type: string }
+        typeId: { type: string }
+    Device:
+      allOf:
+        - $ref: '#/components/schemas/NewDevice'
+        - type: object
+          properties:
+            id: { type: string }
+            status: { type: string, enum: [ONLINE, OFFLINE] }
+            lastSeen: { type: string, format: date-time }
+    Command:
+      type: object
+      required: [name, payload]
+      properties:
+        name: { type: string }
+        payload: { type: object, additionalProperties: true }

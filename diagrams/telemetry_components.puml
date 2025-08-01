@@ -1,0 +1,15 @@
+@startuml TelemetryComponents
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(telemetrySvc, "Telemetry Service")
+
+Component(IngestApi,     "gRPC Ingestion API", "protobuf")
+Component(TopicProducer, "Kafka Producer",     "telemetry.raw topic")
+Component(Consumer,      "Kafka Transformer",  "noise filter, aggregation")
+Component(TsWriter,      "Timescale Writer",   "bulk insert")
+
+Rel(IngestApi,     TopicProducer, "publish msg")
+Rel(TopicProducer, Consumer,      "stream")
+Rel(Consumer,      TsWriter,      "batch write")
+
+@enduml

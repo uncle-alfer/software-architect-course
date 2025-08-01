@@ -1,0 +1,75 @@
+﻿asyncapi: 3.0.0
+info:
+  title: Telemetry Event Bus
+  version: 1.0.0
+  description: Потоковые события с датчиков и агрегированные события.
+defaultContentType: application/json
+servers:
+  kafkaBroker:
+    host: 'kafka:9092'
+    protocol: kafka
+channels:
+  telemetry.raw:
+    address: telemetry.raw
+    messages:
+      publish.message:
+        $ref: '#/components/messages/RawTelemetry'
+  telemetry.aggregated:
+    address: telemetry.aggregated
+    messages:
+      subscribe.message:
+        $ref: '#/components/messages/AggregatedTelemetry'
+operations:
+  telemetry.raw.publish:
+    action: receive
+    channel:
+      $ref: '#/channels/telemetry.raw'
+    summary: Raw telemetry from devices
+    messages:
+      - $ref: '#/channels/telemetry.raw/messages/publish.message'
+  telemetry.aggregated.subscribe:
+    action: send
+    channel:
+      $ref: '#/channels/telemetry.aggregated'
+    summary: Aggregated / filtered telemetry
+    messages:
+      - $ref: '#/channels/telemetry.aggregated/messages/subscribe.message'
+components:
+  messages:
+    RawTelemetry:
+      name: RawTelemetry
+      payload:
+        $ref: '#/components/schemas/TelemetryPayload'
+    AggregatedTelemetry:
+      name: AggregatedTelemetry
+      payload:
+        type: object
+        properties:
+          deviceId:
+            type: string
+          ts:
+            type: string
+            format: date-time
+          avgTemp:
+            type: number
+          window:
+            type: string
+            description: aggregation window
+  schemas:
+    TelemetryPayload:
+      type: object
+      required:
+        - deviceId
+        - ts
+        - key
+        - value
+      properties:
+        deviceId:
+          type: string
+        ts:
+          type: string
+          format: date-time
+        key:
+          type: string
+        value:
+          type: number

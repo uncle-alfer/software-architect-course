@@ -1,0 +1,13 @@
+@startuml RulesComponents
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(ruleSvc, "Rule Engine")
+
+Component(EventConsumer,    "Kafka Consumer",   "telemetry.raw")
+Component(Evaluator,        "Rule Evaluator",   "DSL")
+Component(ActionDispatcher, "Action Dispatcher","REST commands")
+
+Rel(EventConsumer, Evaluator,        "events → eval")
+Rel(Evaluator,     ActionDispatcher, "trigger cmd")
+
+@enduml

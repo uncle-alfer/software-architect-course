@@ -1,0 +1,17 @@
+@startuml Context
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(user, "Пользователь")
+
+System_Boundary(monolith, "Монолит WarmHouse") {
+  System(main, "WarmHouse Web", "Go‑монолит")
+}
+
+System_Ext(sensor,  "Зарегистрированный датчик", "temperature sensor")
+System_Ext(partner, "Партнёрское устройство",   "Zigbee/Z‑Wave")
+
+Rel(user,   main,   "HTTPS")
+Rel(main,   sensor, "HTTP polling")
+Rel(main,   partner, "MQTT (future)")
+
+@enduml
